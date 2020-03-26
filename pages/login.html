@@ -277,12 +277,16 @@
         var databaseConnection = determineDbConnection(username);
         // validate credentials
         if (invalidCredentials(username, password)) return;
+        disableElements();
         webAuth.login({
           realm: databaseConnection,
           username: username,
           password: password
         }, function(err) {
-          if (err) displayError(err);
+          if (err) {
+            displayError(err);
+            reEnableElements();
+            }
         });
       }
 
@@ -293,6 +297,15 @@
         document.getElementById('password-fieldset').style.opacity = 0.5;
         document.getElementById('btn-loading').disabled = true;
         document.getElementById('btn-loading').classList.add('loading');
+      }
+
+      function reEnableElements() {
+        document.getElementById('username').disabled = false;
+        document.getElementById('password').disabled = false;
+        document.getElementById('username-fieldset').style.opacity = 1;
+        document.getElementById('password-fieldset').style.opacity = 1;
+        document.getElementById('btn-loading').disabled = false;
+        document.getElementById('btn-loading').classList.remove('loading');
       }
 
       function displayError(err) {
