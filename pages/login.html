@@ -192,7 +192,7 @@
         <h3>Welcome Back</h3>
         <p>Login to access your Ready Dashboard. If you don’t have an account, please contact <a href="https://readytopay.com/faq" target="_blank">Ready Support</a>.</p>
       </div>
-      <div id="error-message" class="alert">Invalid username or password. Please try again.</div>
+      <div id="error-message" class="alert"></div>
       <form onsubmit="return false;" method="post">
         <div class="form-group">
           <fieldset id="username-fieldset">
@@ -244,10 +244,10 @@
   <script>
     window.addEventListener('load', function() {
 
+      /* auth0 initialization */
       var config = JSON.parse(
         decodeURIComponent(escape(window.atob('@@config@@')))
       );
-
       var params = Object.assign({
         /* additional configuration needed for use of custom domains
         overrides: {
@@ -259,23 +259,20 @@
         redirectUri: config.callbackURL,
         responseType: 'code'
       }, config.internalOptions);
-
       var webAuth = new auth0.WebAuth(params);
 
-      var DATABASE_CONNECTIONS = {
-        'customers': 'Ready-Customers',
-        'employees': 'Ready-Employees'
-      }
-
+      /* process db connection */
       var EMPLOYEE_DOMAINS = [
         'iqmetrix.com'
       ]
-
       function getEmailDomain(email) {
         var [ emailUserName, emailDomain ] = email.split('@');
         return emailDomain;
       }
-
+      var DATABASE_CONNECTIONS = {
+        'customers': 'Ready-Customers',
+        'employees': 'Ready-Employees'
+      }
       function determineDbConnection(email) {
         var emailDomain = getEmailDomain(email);
         return EMPLOYEE_DOMAINS.indexOf(emailDomain) < 0
@@ -283,13 +280,26 @@
           : DATABASE_CONNECTIONS['employees'];
       }
 
+      /* get ui elements */
+      var errorMessageEl = document.getElementById('error-message');
+      var usernameEl = document.getElementById('username');
+      var passwordEl = document.getElementById('password');
+      var usernameRequiredEl = document.getElementById('username-required');
+      var passwordRequiredEl = document.getElementById('password-required');
+      var usernameFieldsetEl = document.getElementById('username-fieldset');
+      var passwordFieldsetEl = document.getElementById('username-fieldset');
+      var usernameLegendEl = document.getElementById('username-legend');
+      var passwordLegendEl = document.getElementById('password-legend');
+      var btnLoginEl = document.getElementById('btn-login');
+
       function login(e) {
         e.preventDefault();
-        var username = document.getElementById('username').value;
-        var password = document.getElementById('password').value;
+        var username = usernameEl.value;
+        var password = passwordEl.value;
         var databaseConnection = determineDbConnection(username);
         // validate credentials
         if (invalidCredentials(username, password)) return;
+        // perform login
         disableElements();
         webAuth.login({
           realm: databaseConnection,
@@ -302,50 +312,48 @@
             }
         });
       }
+      btnLoginEl.addEventListener('click', login);
 
       function disableElements() {
-        document.getElementById('error-message').style.display = 'none';
-        document.getElementById('username').disabled = true;
-        document.getElementById('password').disabled = true;
-        document.getElementById('username-fieldset').style.opacity = 0.5;
-        document.getElementById('password-fieldset').style.opacity = 0.5;
-        document.getElementById('btn-login').disabled = true;
-        document.getElementById('btn-login').classList.add('loading');
+        errorMessageEl.style.display = 'none';
+        usernameEl.disabled = true;
+        passwordEl.disabled = true;
+        usernameFieldsetEl.style.opacity = 0.5;
+        passwordFieldsetEl.style.opacity = 0.5;
+        btnLoginEl.disabled = true;
+        btnLoginEl.classList.add('loading');
       }
 
       function reEnableElements() {
-        document.getElementById('username').disabled = false;
-        document.getElementById('password').disabled = false;
-        document.getElementById('username-fieldset').style.opacity = 1;
-        document.getElementById('password-fieldset').style.opacity = 1;
-        document.getElementById('btn-login').disabled = false;
-        document.getElementById('btn-login').classList.remove('loading');
+        usernameEl.disabled = false;
+        passwordEl.disabled = false;
+        usernameFieldsetEl.style.opacity = 1;
+        passwordFieldsetEl.style.opacity = 1;
+        btnLoginEl.disabled = false;
+        btnLoginEl.classList.remove('loading');
       }
 
       function displayError(err) {
-        var errorMessage = document.getElementById('error-message');
-        errorMessage.innerHTML = err.description;
-        errorMessage.style.display = 'block';
-        document.getElementById('username-fieldset').classList.add('with-error');
-        document.getElementById('password-fieldset').classList.add('with-error');
+        errorMessageEl.innerHTML = err.description;
+        errorMessageEl.style.display = 'block';
+        usernameFieldsetEl.classList.add('with-error');
+        passwordFieldsetEl.classList.add('with-error');
       }
-
-      document.getElementById('btn-login').addEventListener('click', login);
 
       function invalidCredentials(username, password) {
         var invalid = false;
-        document.getElementById('username-required').style.display = 'none';
-        document.getElementById('password-required').style.display = 'none';
+        usernameRequiredEl.style.display = 'none';
+        passwordRequiredEl.style.display = 'none';
 
         if (username === '') {
           invalid = true;
           document.getElementById('username-fieldset').classList.add('with-error');
-          document.getElementById('username-required').style.display = 'block';
+          usernameRequiredEl.style.display = 'block';
         }
         if (password === '') {
           invalid = true;
           document.getElementById('password-fieldset').classList.add('with-error');
-          document.getElementById('password-required').style.display = 'block';
+          passwordRequiredEl.style.display = 'block';
         }
         return invalid;
       }
@@ -353,22 +361,22 @@
       function showLegend(event) {
         var value = event.target.value;
         var inputId = event.target.id;
-        var fieldsetId = inputId + '-fieldset';
-        var legendId = inputId + '-legend';
-        var requiredId = inputId + '-required';
-        
+        var isUsername = inputId === 'username';
+        var targetFieldset = isUsername ? usernameFieldsetEl : passwordFieldsetEl;
+        var targetLegend = isUsername ? usernameLegendEl : passwordLegendEl;
+        var targetRequired = isUsername ? usernameRequiredEl : passwordRequiredEl;
         if (value !== '') {
-          document.getElementById(fieldsetId).classList.remove('with-error');
-          document.getElementById(legendId).style.opacity = 1;
-          document.getElementById(requiredId).style.display = 'none';
+          targetFieldset.classList.remove('with-error');
+          targetLegend.style.opacity = 1;
+          targetRequired.style.display = 'none';
         }
         else {
-          document.getElementById(legendId).style.opacity = 0;
+          targetLegend.style.opacity = 0;
         }
       }
 
-      document.getElementById('username').addEventListener('input', showLegend);
-      document.getElementById('password').addEventListener('input', showLegend);
+      usernameEl.addEventListener('input', showLegend);
+      passwordEl.addEventListener('input', showLegend);
     });
   </script>
 </body>
