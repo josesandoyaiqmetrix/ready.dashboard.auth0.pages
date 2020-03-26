@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Sign In to Ready Dashboard</title>
+  <title>Log In to Ready Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" type="image/x-icon" href="https://images.squarespace-cdn.com/content/v1/5cf6e3be5c4d4d00013589d0/1560188666590-OKJ6IFAPRWXQWF4FSHXI/ke17ZwdGBToddI8pDm48kAAsiHQpGq2AHpKqqY2gmg5Zw-zPPgdn4jUwVcJE1ZvWEtT5uBSRWt4vQZAgTJucoTqqXjS3CfNDSuuf31e0tVE0lIMNPx2RYCrPQDBkjK9XwnGCRLe0rUgTNMzFYHlM3d1lH3P2bFZvTItROhWrBJ0/favicon.ico"/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i,600,600i,700,700i&display=swap" rel="stylesheet">
 </head>
@@ -303,6 +304,7 @@
       }
 
       function disableElements() {
+        document.getElementById('error-message').style.display = 'none';
         document.getElementById('username').disabled = true;
         document.getElementById('password').disabled = true;
         document.getElementById('username-fieldset').style.opacity = 0.5;
