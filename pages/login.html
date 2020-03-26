@@ -109,7 +109,11 @@
     }
 
     input.form-control#password {
-      initial-letter: 2px;
+      letter-spacing: 2px;
+    }
+
+    input.form-control#password::placeholder {
+      letter-spacing: initial;
     }
 
     .with-error legend {
