@@ -316,8 +316,8 @@
 
       function disableElements() {
         errorMessageEl.style.display = 'none';
-        usernameFieldsetEl.classList.add('with-error');
-        passwordFieldsetEl.classList.add('with-error');
+        usernameFieldsetEl.classList.remove('with-error');
+        passwordFieldsetEl.classList.remove('with-error');
         usernameEl.disabled = true;
         passwordEl.disabled = true;
         usernameFieldsetEl.style.opacity = 0.5;
